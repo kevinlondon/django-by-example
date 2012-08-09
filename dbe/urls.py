@@ -11,5 +11,6 @@ urlpatterns = patterns('',
      url(r'^admin/', include(admin.site.urls)),
      url(r'^mark_done/(\d*)/$', "todo.views.mark_done"),
      url(r'^delete/(\d*)/$', "todo.views.delete"),
+     url(r'^toggle_hold/(\d*)/$', "todo.views.toggle_hold"),
 )
 

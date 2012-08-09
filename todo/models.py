@@ -50,6 +50,16 @@ class Item(models.Model):
     priority = models.IntegerField(default=0)
     difficulty = models.IntegerField(default=0)
     done = models.BooleanField(default=False)
+    onhold = models.BooleanField(default=False)
+
+    def toggle_hold(self):
+        if self.onhold:
+            link = "On Hold"
+        else:
+            link = "Off Hold"
+        return "<a href='%s'>%s</a>" % (
+            reverse("todo.views.toggle_hold", args=[self.pk]), link
+            )
 
     def mark_done(self):
         return "<a href='%s'>Done</a>" % reverse("todo.views.mark_done", 
@@ -61,9 +71,10 @@ class Item(models.Model):
 
     delete.allow_tags = True
     mark_done.allow_tags = True
+    toggle_hold.allow_tags = True
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ["name", "priority", "difficulty", "created", 
+    list_display = ["name", "priority", "difficulty", "created", "toggle_hold",
                     "mark_done",  "done", "delete",]
     list_filter = ["priority", "difficulty", "done"]
     search_fields = ["name"]

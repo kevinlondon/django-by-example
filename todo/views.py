@@ -13,6 +13,10 @@ def mark_done(request, pk):
 def delete(request, pk):
     item = Item.objects.get(pk=pk)
     item.delete()
-    item.save()
     return HttpResponseRedirect(reverse("admin:todo_item_changelist"))
 
+def toggle_hold(request, pk):
+    item = Item.objects.get(pk=pk)
+    item.onhold = not item.onhold
+    item.save()
+    return HttpResponseRedirect(reverse("admin:todo_item_changelist"))
