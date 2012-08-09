@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 
 from django.db import models
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 class DateTime(models.Model):
     list_display = ["datetime"]
@@ -38,6 +39,10 @@ class DateTime(models.Model):
             return HttpResponseRedirect(request.path)
         else:
             self.message_user(request, msg)
+            for item in Item.objects.filter(created=obj):
+                if not item.user:
+                    item.user = request.user
+                    item.save()
 
             return HttpResponseRedirect(reverse("admin:todo_item_changelist"))
     
@@ -51,6 +56,13 @@ class Item(models.Model):
     difficulty = models.IntegerField(default=0)
     done = models.BooleanField(default=False)
     onhold = models.BooleanField(default=False)
+    progress = models.IntegerField(default=0)
+    user = models.ForeignKey(User, blank=True, null=True)
+    
+    def return_progress(self):
+        return "<div style='width: 100px; border: 1px solid #ccc; '>" + \
+            "<div style='height: 4px; width: %dpx;" % self.progress + \
+            "background: #555; '></div></div>"
 
     def toggle_hold(self):
         if self.onhold:
@@ -58,24 +70,25 @@ class Item(models.Model):
         else:
             link = "Off Hold"
         return "<a href='%s'>%s</a>" % (
-            reverse("todo.views.toggle_hold", args=[self.pk]), link
+            reverse("todo.views.item_action", args=["onhold", self.pk]), link
             )
 
     def mark_done(self):
-        return "<a href='%s'>Done</a>" % reverse("todo.views.mark_done", 
-                                                 args=[self.pk])
+        return "<a href='%s'>Done</a>" % reverse("todo.views.item_action", 
+                                                 args=["done", self.pk])
     
     def delete(self):
-        return "<a href='%s'>Delete</a>" % reverse("todo.views.delete", 
-                                                   args=[self.pk])
+        return "<a href='%s'>Delete</a>" % reverse("todo.views.item_action", 
+                                                   args=["delete", self.pk])
 
     delete.allow_tags = True
     mark_done.allow_tags = True
     toggle_hold.allow_tags = True
+    return_progress.allow_tags = True
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ["name", "priority", "difficulty", "created", "toggle_hold",
-                    "mark_done",  "done", "delete",]
+    list_display = ["name", "priority", "difficulty", "user", "created", 
+                    "return_progress", "toggle_hold", "mark_done",  "done", "delete",]
     list_filter = ["priority", "difficulty", "done"]
     search_fields = ["name"]
 
