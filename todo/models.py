@@ -8,9 +8,8 @@ from django.contrib import admin
 
 class DateTime(models.Model):
     list_display = ["datetime"]
-    inlines = [ItemInline]
     datetime = models.DateTimeField(auto_now_add=True)
-
+    
     def response_add(self, request, obj, post_url_continue="../%s/"):
         """Determines the HttpResponse for the add_view stage. """
         opts = obj._meta
@@ -33,16 +32,17 @@ class DateTime(models.Model):
                     'opener.dismissAddAnotherPopup(window, "%s", "%s");'
                     '</script>' % (escape(pj_value), escape(obj)))
         elif request.POST.has_key("_addanother"):
-            self.message_user(request, msg + ' ' + (_
-                ("You may add another %s below.") % force_unicode(opts.verbose_name)))
+            self.message_user(request, msg + ' ' + (
+                _("You may add another %s below.") % force_unicode(opts.verbose_name)
+                ))
             return HttpResponseRedirect(request.path)
         else:
             self.message_user(request, msg)
 
             return HttpResponseRedirect(reverse("admin:todo_item_changelist"))
-
+    
     def __unicode__(self):
-        return unicode(self.datetime)
+        return unicode(self.datetime.strftime("%b %d, %Y, %I:%M %p"))
 
 class Item(models.Model):
     name = models.CharField(max_length=60)
@@ -51,8 +51,21 @@ class Item(models.Model):
     difficulty = models.IntegerField(default=0)
     done = models.BooleanField(default=False)
 
+    def mark_done(self):
+        return "<a href='%s'>Done</a>" % reverse("todo.views.mark_done", 
+                                                 args=[self.pk])
+    
+    def delete(self):
+        return "<a href='%s'>Delete</a>" % reverse("todo.views.delete", 
+                                                   args=[self.pk])
+
+    delete.allow_tags = True
+    mark_done.allow_tags = True
+
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ["name", "priority", "difficulty", "created", "done"]
+    list_display = ["name", "priority", "difficulty", "created", 
+                    "mark_done",  "done", "delete",]
+    list_filter = ["priority", "difficulty", "done"]
     search_fields = ["name"]
 
 class ItemInline(admin.TabularInline):
@@ -60,7 +73,9 @@ class ItemInline(admin.TabularInline):
 
 class DateAdmin(admin.ModelAdmin):
     list_display = ["datetime"]
-    inlines = [ItemInline]
+    inlines = [
+            ItemInline,
+            ]
 
 admin.site.register(DateTime, DateAdmin)
 admin.site.register(Item, ItemAdmin)
