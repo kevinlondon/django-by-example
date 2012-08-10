@@ -11,3 +11,8 @@ urlpatterns = patterns('',
      url(r'^admin/', include(admin.site.urls)),
      url(r'^item_action/(done|delete|onhold)/(\d*)/$', "todo.views.item_action"),
 )
+
+urlpatterns += patterns("blog.views",
+    url(r'', 'main'),
+)
+
