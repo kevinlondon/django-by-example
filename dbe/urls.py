@@ -16,5 +16,6 @@ urlpatterns += patterns("blog.views",
     url(r'^$', 'main'),
     url(r'^(\d+)/$', 'post'),
     url(r'^add_comment/(\d+)/$', 'add_comment'),
+    url(r'^month/(\d+)/(\d+)/$', 'month'),
 )
 

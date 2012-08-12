@@ -1,5 +1,18 @@
 {% extends "blog/bbase.html" %}
 
+{% block sidebar %}
+    <style type="text/css">
+        #sidebar { float: right; border: 1px dotted #ccc; padding: 4px; }
+    </style>
+    <div id="sidebar">
+        Monthly Archive<br />
+        {% for month in months %}
+            <a href="{% url blog.views.month month.0 month.1 %}">
+                {{ month.2 }}</a><br />
+        {% endfor %}
+    </div>
+{% endblock %}
+
 {% block content %}
     <div class="main">
 
@@ -13,10 +26,14 @@
                 </h2>
                 <ul>
                     <div class="time" style="font-size:70%">{{ post.created }}</div>
-                    <div class="body">{{ post.body|linebreaks }}</div>
-                    <div class="commentlink" style="text-align: right">
-                        <a href="{% url blog.views.post post.pk %}">Comments</a>
-                    </div>
+                    <ul>
+                        <div class="body">{{ post.body|linebreaks }}</div>
+                        <div class="commentlink" style="text-align: right">
+                            <a href="{% url blog.views.post post.pk %}">
+                                Comments ({{ post.comment_set.count }})
+                            </a>
+                        </div>
+                    </ul>
                 </ul>
             {% endfor %}
         </ul>
