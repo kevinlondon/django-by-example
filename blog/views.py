@@ -55,7 +55,11 @@ def add_comment(request, pk):
 
         comment = cf.save(commit=False)
         comment.author = author
-        comment.save()
+        notify = False
+        if request.user.username == "ak": notify = False
+        
+        comment.save(notify=notify)
+
     return HttpResponseRedirect(reverse("blog.views.post", args=[pk]))
 
 def mkmonth_list():
@@ -87,3 +91,13 @@ def month(request, year, month):
                               dict(post_list=posts, user=request.user,
                                    months=mkmonth_list(), archive=True)
                               )
+
+def delete_comment(request, post_pk, pk=None):
+    """Delete comment(s) with the primary key 'pk' or with pks in POST."""
+    if request.user.is_staff:
+        if not pk: pklist = request.POST.getlist("delete")
+        else: pklist = [pk]
+
+        for pk in pklist:
+            Comment.objects.get(pk=pk).delete()
+        return HttpResponseRedirect(reverse("blog.views.post", args=[post_pk]))
