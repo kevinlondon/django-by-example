@@ -6,10 +6,17 @@
         <!-- Posts -->
         <ul>
             {% for post in posts.object_list %}
-                <div class="title">{{ post.title }}</div>
+                <h2 style="margin:3px; background:#cedff2; font-size:120%;" + \
+                    "font-weight:bold; border:1px solid #a3b0bf; color:#000;" + \
+                    "padding: 0.2em 0.4em;">
+                    <div class="title">{{ post.title }}</div>
+                </h2>
                 <ul>
-                    <div class="time">{{ post.created }}</div>
+                    <div class="time" style="font-size:70%">{{ post.created }}</div>
                     <div class="body">{{ post.body|linebreaks }}</div>
+                    <div class="commentlink" style="text-align: right">
+                        <a href="{% url blog.views.post post.pk %}">Comments</a>
+                    </div>
                 </ul>
             {% endfor %}
         </ul>

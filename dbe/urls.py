@@ -14,5 +14,6 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns("blog.views",
     url(r'', 'main'),
+    url(r'^(\d+)/$', 'post'),
 )
 

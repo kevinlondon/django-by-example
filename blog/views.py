@@ -19,3 +19,9 @@ def main(request):
 
     return render_to_response("blog/list.html",
                               dict(posts=posts, user=request.user))
+
+def post(request, pk):
+    """Single post with comments and a comment form."""
+    post = Post.objects.get(pk=int(pk))
+    d = dict(post=post, user=request.user)
+    return render_to_response("blog/post/post.html", d)

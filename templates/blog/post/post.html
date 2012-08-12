@@ -1,0 +1,13 @@
+{% extends "blog/bbase.html" %}
+
+<div class="title">{{ post.title }}</div>
+<ul>
+    <div class="time">{{ post.created }}</div>
+    <div class="body">{{ post.body|linebreaks }}</div>
+</ul>
+
+<!-- Comments -->
+<div class="commentlink">
+    <a href="{% url blog.views.post post.pk %}">Comments</a></div>
+</div>
+
